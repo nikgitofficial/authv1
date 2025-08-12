@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 5000;
 const CLIENT_URLS = [
   process.env.CLIENT_URL || "http://localhost:5173",
   "http://localhost:5173", // local dev
-  "", // deployed frontend
+  "authv1-kgo5azt1j-nikkos-projects-06c8e312.vercel.app", // deployed frontend
   
 ];
 
