@@ -18,6 +18,8 @@ const CLIENT_URLS = [
   process.env.CLIENT_URL || "http://localhost:5173",
   "http://localhost:5173", // local dev
   "authv1-kgo5azt1j-nikkos-projects-06c8e312.vercel.app", // deployed frontend
+  "authv1-git-main-nikkos-projects-06c8e312.vercel.app", // deployed frontend
+  "authv1-763qbdkvg-nikkos-projects-06c8e312.vercel.app", // deployed frontend
   
 ];
 
