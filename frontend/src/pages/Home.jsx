@@ -32,7 +32,7 @@ import {
 
 const COLORS = ["#60a5fa", "#4ade80", "#facc15", "#f87171", "#a78bfa"];
 
-const Dashboard = () => {
+const Home = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -392,4 +392,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Home;

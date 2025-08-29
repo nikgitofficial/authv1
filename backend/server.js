@@ -6,6 +6,9 @@ import mongoose from "mongoose";
 
 import authRoutes from "./routes/authRoutes.js";
 
+import questionSetRoutes from "./routes/questionSetRoutes.js";
+
+
 
 
 dotenv.config();
@@ -17,8 +20,8 @@ const PORT = process.env.PORT || 5000;
 const CLIENT_URLS = [
   process.env.CLIENT_URL || "http://localhost:5173",
   "http://localhost:5173", // local dev
-  "authv1-201t9kxcn-nikkos-projects-06c8e312.vercel.app",
-   "https://authv1-six.vercel.app", // deployed frontend
+  "frontend-app.vercel.app",
+   "https://frontend-app.vercel.app", // deployed frontend
   
   
 ];
@@ -40,6 +43,9 @@ app.use(cookieParser());
 
 // ✅ API Routes
 app.use("/api/auth", authRoutes);
+
+app.use("/api/question-sets", questionSetRoutes);
+
 
 
 

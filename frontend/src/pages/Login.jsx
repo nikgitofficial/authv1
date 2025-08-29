@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import {
   Container, Box, TextField, Button, Typography,
   Paper, Divider, Alert, Snackbar, CircularProgress
@@ -14,51 +14,60 @@ const Login = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const navigate = useNavigate();
-  const { setUser } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      if (user.role === "admin") navigate("/admin"); // ✅ admin redirect
+      else navigate("/dashboard");
+    }
+  }, [user, navigate]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-  try {
-    const res = await axios.post("/auth/login", form, {
-      withCredentials: true,
-    });
+    try {
+      const res = await axios.post("/auth/login", form, { withCredentials: true });
+      const { accessToken, refreshToken } = res.data;
 
-    const { accessToken, refreshToken } = res.data;
-    localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("refreshToken", refreshToken); // <-- Save refresh token!
+      // Save tokens
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
 
-    const me = await axios.get("/auth/me", {
-      headers: { Authorization: `Bearer ${accessToken}` },
-      withCredentials: true,
-    });
+      // Get user info
+      const me = await axios.get("/auth/me", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        withCredentials: true,
+      });
 
-    setUser(me.data);
-    localStorage.setItem("user", JSON.stringify(me.data)); // <-- Save user data too
+      setUser(me.data);
+      localStorage.setItem("user", JSON.stringify(me.data));
 
-    setSnackbarOpen(true); // Show success snackbar
+      setSnackbarOpen(true);
 
-    setTimeout(() => {
-      navigate("/"); // Navigate after brief delay
-    }, 1000);
-  } catch (err) {
-    setError(err.response?.data?.msg || "Login failed");
+      // ✅ Navigate based on role
+      if (me.data.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (err) {
+      setError(err.response?.data?.msg || "Login failed");
 
-    // Clean up tokens on failure
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("user");
-  } finally {
-    setLoading(false);
-  }
-};
-
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Container maxWidth="sm">

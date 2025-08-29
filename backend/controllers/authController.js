@@ -4,16 +4,22 @@ import User from "../models/User.js";
 import { createAccessToken, createRefreshToken } from "../utils/tokenUtils.js";
 
 export const register = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, role } = req.body; // ✅ include role
   const existingUser = await User.findOne({ email });
   if (existingUser) return res.status(400).json({ msg: "User already exists" });
 
   const hashed = await bcrypt.hash(password, 10);
-  const newUser = new User({ username, email, password: hashed });
+  const newUser = new User({ 
+    username, 
+    email, 
+    password: hashed, 
+    role: role || "user" // ✅ default to user unless specified
+  });
   await newUser.save();
 
   res.status(201).json({ msg: "Registered successfully" });
 };
+
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
@@ -23,13 +29,13 @@ export const login = async (req, res) => {
   const match = await bcrypt.compare(password, user.password);
   if (!match) return res.status(400).json({ msg: "Invalid credentials" });
 
-  const payload = { id: user._id, username: user.username };
+  const payload = { id: user._id, username: user.username, role: user.role }; // ✅ include role
   const accessToken = createAccessToken(payload);
   const refreshToken = createRefreshToken(payload);
 
-  // ✅ Send both tokens in response (not cookies)
   res.json({ accessToken, refreshToken });
 };
+
 
 export const refresh = (req, res) => {
   const authHeader = req.headers.authorization;
